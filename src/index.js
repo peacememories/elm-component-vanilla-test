@@ -8,34 +8,38 @@ class MyWebComponent extends HTMLElement {
 
     this.appendChild(elmNode);
 
-    this.elmRuntime = Elm.Main.init({
+    this.elmRuntime = Elm.Element.init({
       node: elmNode,
       flags: this.getAttribute("name") || "Unknown Person"
     });
+
+    this.elmRuntime.ports.updateValue.subscribe((str) => {
+      this.dispatchEvent(new CustomEvent("change", {
+        detail: str
+      }))
+      this.setAttribute("name", str);
+    });
+  }
+
+  disconnectedCallback() {
+    this.elmRuntime.ports.updateValue.unsubscribe();
   }
 
   attributeChangedCallback(name, oldValue, newValue) {
-    //TODO implement this
+    if (!this.elmRuntime) {
+      return;
+    }
+    switch (name) {
+      case "name":
+        this.elmRuntime.ports.values.send(newValue);
+    }
   }
 }
 
 customElements.define("my-webcomponent", MyWebComponent);
 
-let count = 0;
-
-const reload = () => {
-  const oldElement = document.querySelector("my-webcomponent");
-  const newElement = document.createElement("my-webcomponent");
-
-  const name = oldElement.getAttribute("name")
-  const rotatedName = name.repeat(2).slice(1, name.length + 1);
-
-  newElement.setAttribute("name", rotatedName);
-  oldElement.parentElement.replaceChild(newElement, oldElement);
-
-  if (count++ < 2000) {
-    requestAnimationFrame(reload);
-  }
-};
-
-requestAnimationFrame(reload);
+setTimeout(() => {
+  document.querySelector("my-webcomponent").addEventListener("change", (event) => {
+    console.log(event);
+  })
+}, 0)
