@@ -8,7 +8,7 @@ class MyWebComponent extends HTMLElement {
 
     this.appendChild(elmNode);
 
-    this.elmRuntime = Elm.Element.init({
+    this.elmRuntime = Elm.Component.init({
       node: elmNode,
       flags: this.getAttribute("name") || "Unknown Person"
     });
@@ -38,8 +38,6 @@ class MyWebComponent extends HTMLElement {
 
 customElements.define("my-webcomponent", MyWebComponent);
 
-setTimeout(() => {
-  document.querySelector("my-webcomponent").addEventListener("change", (event) => {
-    console.log(event);
-  })
-}, 0)
+Elm.Host.init({
+  node: document.querySelector("#host")
+}); 

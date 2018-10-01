@@ -1,4 +1,4 @@
-port module Element exposing (main)
+port module Component exposing (main)
 
 import Browser
 import Html exposing (..)
